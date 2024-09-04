@@ -1,0 +1,44 @@
+package com.example.car.service.auth;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.car.DTO.SingupRequest;
+import com.example.car.DTO.UserDTO;
+import com.example.car.entity.User;
+import com.example.car.enums.UserRole;
+import com.example.car.resposie.UserRepository;
+@Service
+public class authenimple implements authenService {
+	@Autowired
+    private final  UserRepository userRepository;
+
+    public authenimple(UserRepository userRepository) {
+		super();
+		this.userRepository = userRepository;
+	}
+
+	@Override
+    public UserDTO createCustomer(SingupRequest signupRequest) {
+        User user = new User();
+        user.setName(signupRequest.getName());
+        user.setEmail(signupRequest.getEmail());
+        user.setPassword(signupRequest.getPassword());
+        user.setUserRole(UserRole.CUSTOMER);
+        
+        User createUser = userRepository.save(user);
+        
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(createUser.getId());
+        
+        
+        return userDTO;
+    }
+
+    @Override
+    public boolean hasCustomerWithEmail(String email) {
+        return userRepository.findFirstByEmail(email).isPresent();
+    }
+
+}
